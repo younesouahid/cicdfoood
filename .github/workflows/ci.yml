@@ -1,0 +1,26 @@
+name: CI
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Récuperer le code
+              uses: actions/checkout@v3
+            
+            - name: Installe Node.js
+              uses: actions/setup-node@v4
+              with:
+                node-version: 22
+
+            - name: Installer les dépendances
+              run: npm ci
+
+            - name: Verifier le code
+              run: npm run lint
+            
+            - name: Executer les test
+              run: npm test
