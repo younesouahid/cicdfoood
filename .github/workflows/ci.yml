@@ -24,3 +24,30 @@ jobs:
             
             - name: Executer les test
               run: npm test
+
+            - name: construire l'image docker
+              run: docker build -t cicdfood .
+
+            - name: demarrer le conteneur docker
+              run: docker run -d --name cicd-demo -p 3000:3000 cicdfood
+
+            - name: Attendre l'application
+              run: |
+                for i in {1..10}; do
+                  if curl --fail http://localhost:3000/api/health; then
+                    exit 0
+                  fi
+                  sleep 2
+                done
+                docker logs cicd-demo
+                exit 1
+
+            - name: Verifier le calcul TTC
+              run: |
+                curl --fail "http://localhost:3000/api/calcul/ttc?prix=100&tva=20" \
+                 | grep '"prixTTC":120'
+
+            - name: Nettoyer le conteneur
+              if: always()
+              run: docker rm cicd-demo || true
+
