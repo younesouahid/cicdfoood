@@ -78,3 +78,22 @@ jobs:
         run: |
           docker push "$IMAGE_NAME:${GITHUB_SHA}"
           docker push "$IMAGE_NAME:latest"
+  deploy_staging:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: staging
+    permissions:
+      contents: read
+      packages: read
+
+    steps:
+        
+      - name: Reconstruire la reference
+        run: |
+          REPO="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
+          echo "IMAGE_NAME=ghcr.io/$REPO" >> "$GITHUB_ENV"
+
+      - name: Controler la reference
+        run: |
+          test -n "$IMAGE_NAME"
+          echo "IMAGE_NAME=$IMAGE_NAME"
