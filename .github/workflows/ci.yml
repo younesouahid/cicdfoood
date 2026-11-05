@@ -87,7 +87,6 @@ jobs:
       packages: read
 
     steps:
-        
       - name: Reconstruire la reference
         run: |
           REPO="$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]')"
@@ -97,3 +96,15 @@ jobs:
         run: |
           test -n "$IMAGE_NAME"
           echo "IMAGE_NAME=$IMAGE_NAME"
+
+      - name: Connexion a GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Telecharger l'image
+        run: |
+          docker pull "$IMAGE_NAME=${GITHUB_SHA}"
+          docker image ls "$IMAGE_NAME"
