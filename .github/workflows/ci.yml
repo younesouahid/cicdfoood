@@ -114,3 +114,16 @@ jobs:
           docker run -d --name cicd-staging \
             -p 3000:3000 "$IMAGE_NAME:${GITHUB_SHA}"
           docker ps --filter name=cicd-staging
+
+      - name: Attendre l'API
+        shell: bash
+        run: |
+          for i in {1..15}; do
+            if curl --fail --silent \
+              http://localhost:3000/api/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker logs cicd-staging
+          exit 1
