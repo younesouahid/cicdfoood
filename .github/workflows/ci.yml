@@ -106,5 +106,11 @@ jobs:
 
       - name: Telecharger l'image
         run: |
-          docker pull "$IMAGE_NAME=${GITHUB_SHA}"
+          docker pull "$IMAGE_NAME:${GITHUB_SHA}"
           docker image ls "$IMAGE_NAME"
+
+      - name: Demarrer le staging
+        run: |
+          docker run -d --name cicd-staging \
+            -p 3000:3000 "$IMAGE_NAME:${GITHUB_SHA}"
+          docker ps --filter name=cicd-staging
